@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Management System</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f0f2f5;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 420px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        table {
+            width: 80%;
+            margin: 30px auto;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .delete-btn {
+            background: red;
+            padding: 5px 10px;
+            border: none;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🎓 Student Management System</h1>
+
+<!-- ADD STUDENT -->
+<div class="card">
+    <h3>Add Student</h3>
+
+    <form action="/students/add" method="post">
+        <input type="text" name="name" placeholder="Enter Name" required />
+        <input type="email" name="email" placeholder="Enter Email" required />
+        <button type="submit">➕ Add Student</button>
+    </form>
+</div>
+
+<!-- STUDENT LIST -->
+<h2>📋 Student List</h2>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Action</th>
+    </tr>
+
+    <!-- Example static row (later we will make dynamic) -->
+    <tr>
+        <td>1</td>
+        <td>example</td>
+        <td>example@gmail.com</td>
+        <td>
+            <button class="delete-btn">Delete</button>
+        </td>
+    </tr>
+
+</table>
+
+</body>
+</html>
