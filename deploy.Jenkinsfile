@@ -12,7 +12,7 @@ pipeline {
         APP_NAME = "student-app"
         APP_PORT = "9090"
 
-        ENV_FILE = "/home/prabesh/.spring.env"
+        ENV_FILE = "/home/ubuntu/.spring.env"
     }
 
     stages {
