@@ -11,7 +11,7 @@ pipeline {
 
         APP_NAME = "student-app"
 
-        // ⚠️ FIX: Avoid Jenkins conflict (DO NOT use 8080)
+        // FIXED: avoid Jenkins port conflict
         HOST_PORT = "9090"
         CONTAINER_PORT = "8080"
 
@@ -24,7 +24,7 @@ pipeline {
             steps {
                 sshagent(['deployment-server-ssh']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} \
+                    ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} \\
                     docker pull ${IMAGE_NAME}:${IMAGE_TAG}
                     """
                 }
@@ -64,17 +64,24 @@ pipeline {
             steps {
                 sshagent(['deployment-server-ssh']) {
                     sh """
+                    ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
+                    
                     echo "Waiting for application to start..."
 
-                    for i in {1..10}
+                    for i in {1..12}
                     do
-                      curl -f http://${DEPLOY_SERVER}:${HOST_PORT}/actuator/health && exit 0
-                      echo "Attempt $i failed... retrying"
-                      sleep 10
+                      if curl -f http://localhost:${HOST_PORT}/actuator/health; then
+                        echo "Application is UP"
+                        exit 0
+                      fi
+
+                      echo "Attempt \$i failed... retrying"
+                      sleep 5
                     done
 
                     echo "Health check failed"
                     exit 1
+                    '
                     """
                 }
             }
