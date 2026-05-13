@@ -48,8 +48,9 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
                     docker run -d \
                     --name ${APP_NAME} \
-                    -p ${APP_PORT}:9090 \
+                    --network host \
                     --env-file ${ENV_FILE} \
+                    --restart unless-stopped \
                     ${IMAGE_NAME}:${IMAGE_TAG}
                     '
                     """
