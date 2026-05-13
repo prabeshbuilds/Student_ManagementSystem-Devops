@@ -10,12 +10,9 @@ pipeline {
         DEPLOY_PORT   = "22"
 
         APP_NAME = "student-app"
+        APP_PORT = "9090"
 
-        // FIXED: avoid Jenkins port conflict
-        HOST_PORT = "9090"
-        CONTAINER_PORT = "8080"
-
-        ENV_FILE = "/home/ubuntu/.spring.env"
+        ENV_FILE = "/home/prabesh/.spring.env"
     }
 
     stages {
@@ -24,19 +21,20 @@ pipeline {
             steps {
                 sshagent(['deployment-server-ssh']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} \\
+                    ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} \
                     docker pull ${IMAGE_NAME}:${IMAGE_TAG}
                     """
                 }
             }
         }
 
-        stage('🛑 Stop Old Container') {
+        stage('🛑 Clean Old Container & Free Port') {
             steps {
                 sshagent(['deployment-server-ssh']) {
                     sh """
                     ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
-                    docker rm -f ${APP_NAME} || true
+                    docker rm -f ${APP_NAME} || true &&
+                    sudo fuser -k ${APP_PORT}/tcp || true
                     '
                     """
                 }
@@ -50,8 +48,7 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
                     docker run -d \
                     --name ${APP_NAME} \
-                    -p ${HOST_PORT}:${CONTAINER_PORT} \
-                    --restart unless-stopped \
+                    -p ${APP_PORT}:9090 \
                     --env-file ${ENV_FILE} \
                     ${IMAGE_NAME}:${IMAGE_TAG}
                     '
@@ -60,28 +57,12 @@ pipeline {
             }
         }
 
-        stage('🔍 Health Check (Robust)') {
+        stage('🔍 Health Check') {
             steps {
                 sshagent(['deployment-server-ssh']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
-                    
-                    echo "Waiting for application to start..."
-
-                    for i in {1..12}
-                    do
-                      if curl -f http://localhost:${HOST_PORT}/actuator/health; then
-                        echo "Application is UP"
-                        exit 0
-                      fi
-
-                      echo "Attempt \$i failed... retrying"
-                      sleep 5
-                    done
-
-                    echo "Health check failed"
-                    exit 1
-                    '
+                    sleep 20
+                    curl -f http://${DEPLOY_SERVER}:${APP_PORT}/actuator/health || exit 1
                     """
                 }
             }
@@ -90,7 +71,7 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deployment Successful!'
+            echo '✅ Java App Deployment Successful!'
         }
 
         failure {
