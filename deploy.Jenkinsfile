@@ -10,7 +10,10 @@ pipeline {
         DEPLOY_PORT   = "22"
 
         APP_NAME = "student-app"
-        APP_PORT = "8080"
+
+        // ⚠️ FIX: Avoid Jenkins conflict (DO NOT use 8080)
+        HOST_PORT = "9090"
+        CONTAINER_PORT = "8080"
 
         ENV_FILE = "/home/ubuntu/.spring.env"
     }
@@ -28,13 +31,12 @@ pipeline {
             }
         }
 
-        stage('🛑 Clean Old Container & Free Port') {
+        stage('🛑 Stop Old Container') {
             steps {
                 sshagent(['deployment-server-ssh']) {
                     sh """
                     ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
-                    docker rm -f ${APP_NAME} || true &&
-                    sudo fuser -k ${APP_PORT}/tcp || true
+                    docker rm -f ${APP_NAME} || true
                     '
                     """
                 }
@@ -48,7 +50,8 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
                     docker run -d \
                     --name ${APP_NAME} \
-                    -p ${APP_PORT}:8080 \
+                    -p ${HOST_PORT}:${CONTAINER_PORT} \
+                    --restart unless-stopped \
                     --env-file ${ENV_FILE} \
                     ${IMAGE_NAME}:${IMAGE_TAG}
                     '
@@ -57,12 +60,21 @@ pipeline {
             }
         }
 
-        stage('🔍 Health Check') {
+        stage('🔍 Health Check (Robust)') {
             steps {
                 sshagent(['deployment-server-ssh']) {
                     sh """
-                    sleep 20
-                    curl -f http://${DEPLOY_SERVER}:${APP_PORT}/actuator/health || exit 1
+                    echo "Waiting for application to start..."
+
+                    for i in {1..10}
+                    do
+                      curl -f http://${DEPLOY_SERVER}:${HOST_PORT}/actuator/health && exit 0
+                      echo "Attempt $i failed... retrying"
+                      sleep 10
+                    done
+
+                    echo "Health check failed"
+                    exit 1
                     """
                 }
             }
@@ -71,7 +83,7 @@ pipeline {
 
     post {
         success {
-            echo '✅ Java App Deployment Successful!'
+            echo '✅ Deployment Successful!'
         }
 
         failure {
