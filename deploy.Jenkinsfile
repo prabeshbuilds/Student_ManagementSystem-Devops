@@ -63,12 +63,14 @@ pipeline {
                     sh """
                     ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
                     echo "Waiting for app to be ready..."
-                    for i in {1..15}; do
-                        echo "Health check attempt $i/15..."
+                    counter=1
+                    while [ \$counter -le 15 ]; do
+                        echo "Health check attempt \$counter/15..."
                         if curl -f http://127.0.0.1:${APP_PORT}/actuator/health; then
                             echo "✅ App is healthy!"
                             exit 0
                         fi
+                        counter=\$((counter + 1))
                         sleep 10
                     done
                     echo "❌ Health check failed, showing container logs:"
