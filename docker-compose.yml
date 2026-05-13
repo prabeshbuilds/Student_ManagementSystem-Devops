@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+
+  app:
+    build: .
+    container_name: student-app
+    ports:
+      - "1000:9999"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/student_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: mypassword123
+
+  db:
+    image: postgres:16
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: student_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword123
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
