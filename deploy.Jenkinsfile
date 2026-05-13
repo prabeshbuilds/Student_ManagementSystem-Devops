@@ -48,8 +48,9 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
                     docker run -d \
                     --name ${APP_NAME} \
-                    -p ${APP_PORT}:9090 \
+                    -p ${APP_PORT}:${APP_PORT} \
                     --env-file ${ENV_FILE} \
+                    --restart unless-stopped \
                     ${IMAGE_NAME}:${IMAGE_TAG}
                     '
                     """
@@ -68,7 +69,7 @@ pipeline {
                         fi
                         sleep 10
                     done
-                    echo "Health check failed, showing last container logs:"
+                    echo "Health check failed, showing container logs:"
                     docker logs ${APP_NAME} --tail 50
                     exit 1
                     '
