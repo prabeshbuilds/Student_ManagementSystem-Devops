@@ -61,8 +61,20 @@ pipeline {
             steps {
                 sshagent(['deployment-server-ssh']) {
                     sh """
-                    sleep 5
-                    curl -f http://${DEPLOY_SERVER}:${APP_PORT}/actuator/health || exit 1
+                    ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
+                    echo "Waiting for app to be ready..."
+                    for i in {1..15}; do
+                        echo "Health check attempt $i/15..."
+                        if curl -f http://127.0.0.1:${APP_PORT}/actuator/health; then
+                            echo "✅ App is healthy!"
+                            exit 0
+                        fi
+                        sleep 10
+                    done
+                    echo "❌ Health check failed, showing container logs:"
+                    docker logs ${APP_NAME} --tail 100
+                    exit 1
+                    '
                     """
                 }
             }
