@@ -1,116 +1,347 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Student Management System</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Student Management System</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f0f2f5; color: #1a1a1a; min-height: 100vh; padding: 2rem 1rem; }
+  h1 { font-size: 20px; font-weight: 600; }
+  .sms { max-width: 720px; margin: 0 auto; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .header span { font-size: 13px; color: #666; }
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #f0f2f5;
-            text-align: center;
-        }
+  /* Stats */
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .stat { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 16px; }
+  .stat-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .stat-value { font-size: 24px; font-weight: 600; color: #1a1a1a; }
 
-        h1 {
-            color: #333;
-        }
+  /* Add card */
+  .add-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
+  .add-card h2 { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 12px; color: #666; font-weight: 500; }
+  .field input, .field select {
+    font-size: 14px; padding: 8px 10px; border-radius: 8px;
+    border: 1px solid #d1d5db; background: #fff; color: #1a1a1a;
+    outline: none; width: 100%;
+  }
+  .field input:focus, .field select:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+  .form-actions { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+  .btn-primary {
+    background: #6366f1; color: #fff; border: none;
+    border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .btn-primary:hover { background: #4f46e5; }
+  .btn-secondary {
+    background: transparent; color: #555; border: 1px solid #d1d5db;
+    border-radius: 8px; padding: 9px 14px; font-size: 13px; cursor: pointer;
+  }
+  .btn-secondary:hover { background: #f3f4f6; }
+  .form-err { font-size: 12px; color: #dc2626; margin-left: 4px; }
 
-        .card {
-            background: white;
-            padding: 20px;
-            margin: 20px auto;
-            width: 420px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
+  /* Table card */
+  .table-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
+  .table-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; gap: 8px; }
+  .table-header h2 { font-size: 14px; font-weight: 600; }
+  .search-row { display: flex; gap: 8px; align-items: center; }
+  .search-wrap { position: relative; }
+  .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 16px; pointer-events: none; }
+  .search-wrap input { padding-left: 32px; width: 180px; font-size: 13px; }
+  .filter-select { font-size: 13px; padding: 8px 10px; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; color: #1a1a1a; }
 
-        input {
-            width: 90%;
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  thead th { font-size: 12px; font-weight: 600; color: #6b7280; text-align: left; padding: 10px 14px; border-bottom: 1px solid #e5e7eb; background: #f9fafb; }
+  th:nth-child(1) { width: 40px; }
+  th:nth-child(2) { width: 150px; }
+  th:nth-child(3) { width: 180px; }
+  th:nth-child(4) { width: 110px; }
+  th:nth-child(5) { width: 90px; }
+  th:nth-child(6) { width: 90px; }
+  tbody tr { border-bottom: 1px solid #f3f4f6; transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f9fafb; }
+  td { font-size: 13px; padding: 10px 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        button {
-            padding: 10px 20px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+  .av-blue   { background: #dbeafe; color: #1e40af; }
+  .av-teal   { background: #ccfbf1; color: #115e59; }
+  .av-coral  { background: #fee2e2; color: #991b1b; }
+  .av-pink   { background: #fce7f3; color: #9d174d; }
+  .av-amber  { background: #fef3c7; color: #92400e; }
 
-        button:hover {
-            background: #45a049;
-        }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-active   { background: #dcfce7; color: #15803d; }
+  .badge-inactive { background: #f3f4f6; color: #6b7280; }
+  .badge-pending  { background: #fef9c3; color: #854d0e; }
 
-        table {
-            width: 80%;
-            margin: 30px auto;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-        }
+  .row-actions { display: flex; gap: 6px; align-items: center; }
+  .icon-btn { background: transparent; border: 1px solid #e5e7eb; border-radius: 6px; padding: 4px 7px; cursor: pointer; color: #6b7280; font-size: 14px; display: flex; align-items: center; }
+  .icon-btn:hover { background: #f3f4f6; color: #1a1a1a; }
+  .icon-btn.del:hover { border-color: #fca5a5; color: #dc2626; background: #fee2e2; }
 
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-        }
+  .empty { padding: 2.5rem; text-align: center; color: #9ca3af; font-size: 13px; }
+  .empty i { font-size: 28px; display: block; margin-bottom: 8px; }
 
-        th {
-            background: #4CAF50;
-            color: white;
-        }
+  .pagination { display: flex; align-items: center; justify-content: flex-end; gap: 5px; padding: 10px 14px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280; }
+  .page-btn { padding: 4px 9px; border: 1px solid #e5e7eb; border-radius: 6px; background: transparent; cursor: pointer; font-size: 12px; color: #6b7280; }
+  .page-btn:hover { background: #f3f4f6; }
+  .page-btn.active { background: #6366f1; color: #fff; border-color: #6366f1; }
+  .page-btn:disabled { opacity: 0.4; cursor: default; }
 
-        .delete-btn {
-            background: red;
-            padding: 5px 10px;
-            border: none;
-            color: white;
-            border-radius: 5px;
-        }
-    </style>
+  .toast {
+    position: fixed; bottom: 1.5rem; right: 1.5rem;
+    background: #f0fdf4; border: 1px solid #86efac; color: #15803d;
+    border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 500;
+    opacity: 0; transform: translateY(8px); transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none; z-index: 9999;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 520px) {
+    .form-row { grid-template-columns: 1fr; }
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .search-wrap input { width: 130px; }
+    th:nth-child(3), td:nth-child(3) { display: none; }
+  }
+</style>
 </head>
-
 <body>
 
-<h1>🎓 Student Management System</h1>
+<div class="sms">
+  <div class="header">
+    <h1><i class="ti ti-school" style="margin-right:6px;vertical-align:-2px"></i>Student Management</h1>
+    <span>Academic year 2025–26</span>
+  </div>
 
-<!-- ADD STUDENT -->
-<div class="card">
-    <h3>Add Student</h3>
+  <!-- Stats -->
+  <div class="stat-row">
+    <div class="stat"><div class="stat-label">Total students</div><div class="stat-value" id="s-total">0</div></div>
+    <div class="stat"><div class="stat-label">Active</div><div class="stat-value" id="s-active">0</div></div>
+    <div class="stat"><div class="stat-label">Departments</div><div class="stat-value" id="s-depts">0</div></div>
+  </div>
 
-    <form action="/students/add" method="post">
-        <input type="text" name="name" placeholder="Enter Name" required />
-        <input type="email" name="email" placeholder="Enter Email" required />
-        <button type="submit">➕ Add Student</button>
-    </form>
+  <!-- Add Student Form -->
+  <div class="add-card">
+    <h2><i class="ti ti-user-plus" style="margin-right:6px;vertical-align:-2px"></i>Add new student</h2>
+    <div class="form-row">
+      <div class="field">
+        <label for="f-name">Full name</label>
+        <input id="f-name" type="text" placeholder="e.g. Priya Sharma" />
+      </div>
+      <div class="field">
+        <label for="f-email">Email</label>
+        <input id="f-email" type="email" placeholder="e.g. priya@edu.np" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="f-dept">Department</label>
+        <select id="f-dept">
+          <option value="">Select department</option>
+          <option>Computer Science</option>
+          <option>Business</option>
+          <option>Engineering</option>
+          <option>Medicine</option>
+          <option>Arts &amp; Humanities</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-year">Year</label>
+        <select id="f-year">
+          <option value="">Select year</option>
+          <option>1st year</option>
+          <option>2nd year</option>
+          <option>3rd year</option>
+          <option>4th year</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-primary" onclick="addStudent()"><i class="ti ti-plus"></i> Add student</button>
+      <button class="btn-secondary" onclick="clearForm()">Clear</button>
+      <span class="form-err" id="form-err"></span>
+    </div>
+  </div>
+
+  <!-- Student Table -->
+  <div class="table-card">
+    <div class="table-header">
+      <h2>Student list</h2>
+      <div class="search-row">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input type="text" id="search" placeholder="Search..." oninput="renderTable()" />
+        </div>
+        <select class="filter-select" id="filter-status" onchange="renderTable()">
+          <option value="">All statuses</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+          <option value="Pending">Pending</option>
+        </select>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Department</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tbl-body"></tbody>
+    </table>
+
+    <div id="empty-state" class="empty" style="display:none">
+      <i class="ti ti-users-group"></i>No students found
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </div>
 </div>
 
-<!-- STUDENT LIST -->
-<h2>📋 Student List</h2>
+<div class="toast" id="toast"></div>
 
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Action</th>
-    </tr>
+<script>
+  const COLORS = ['blue','teal','coral','pink','amber'];
+  let students = [
+    { id:1, name:'Aarav Poudel',   email:'aarav@ku.edu.np',    dept:'Computer Science',   year:'2nd year', status:'Active'   },
+    { id:2, name:'Sita Thapa',     email:'sita@ioe.edu.np',    dept:'Engineering',        year:'3rd year', status:'Active'   },
+    { id:3, name:'Rohan Maharjan', email:'rohan@tu.edu.np',    dept:'Business',           year:'1st year', status:'Pending'  },
+    { id:4, name:'Anita Gurung',   email:'anita@bpkihs.edu',   dept:'Medicine',           year:'4th year', status:'Active'   },
+    { id:5, name:'Bikash Karki',   email:'bikash@ku.edu.np',   dept:'Arts & Humanities',  year:'2nd year', status:'Inactive' },
+  ];
+  let nextId = 6, page = 1;
+  const PER = 5;
 
-    <!-- Example static row (later we will make dynamic) -->
-    <tr>
-        <td>1</td>
-        <td>example</td>
-        <td>example@gmail.com</td>
-        <td>
-            <button class="delete-btn">Delete</button>
-        </td>
-    </tr>
+  function initials(n) { return n.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(); }
+  function avColor(n)   { return COLORS[n.charCodeAt(0) % COLORS.length]; }
+  function badgeClass(s){ return s==='Active'?'badge-active': s==='Pending'?'badge-pending':'badge-inactive'; }
 
-</table>
+  function filtered() {
+    const q  = document.getElementById('search').value.toLowerCase();
+    const st = document.getElementById('filter-status').value;
+    return students.filter(s => {
+      const mq = !q  || (s.name + s.email + s.dept).toLowerCase().includes(q);
+      const ms = !st || s.status === st;
+      return mq && ms;
+    });
+  }
 
+  function renderTable() {
+    const data  = filtered();
+    const total = data.length;
+    const pages = Math.max(1, Math.ceil(total / PER));
+    if (page > pages) page = pages;
+    const slice = data.slice((page-1)*PER, page*PER);
+    const body  = document.getElementById('tbl-body');
+    const empty = document.getElementById('empty-state');
+
+    if (!slice.length) {
+      body.innerHTML = '';
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      body.innerHTML = slice.map(s => `
+        <tr id="row-${s.id}">
+          <td><div class="avatar av-${avColor(s.name)}">${initials(s.name)}</div></td>
+          <td title="${s.name}">
+            <strong style="font-weight:600">${s.name}</strong><br>
+            <span style="font-size:11px;color:#9ca3af">${s.year}</span>
+          </td>
+          <td title="${s.email}" style="color:#6b7280">${s.email}</td>
+          <td title="${s.dept}" style="font-size:12px">${s.dept}</td>
+          <td><span class="badge ${badgeClass(s.status)}">${s.status}</span></td>
+          <td>
+            <div class="row-actions">
+              <button class="icon-btn" onclick="cycleStatus(${s.id})" title="Toggle status">
+                <i class="ti ti-refresh"></i>
+              </button>
+              <button class="icon-btn del" onclick="deleteStudent(${s.id})" title="Delete">
+                <i class="ti ti-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>`).join('');
+    }
+    renderPagination(pages, total);
+    updateStats();
+  }
+
+  function renderPagination(pages, total) {
+    const pg = document.getElementById('pagination');
+    if (pages <= 1) { pg.innerHTML = ''; return; }
+    let h = `<span>${(page-1)*PER+1}–${Math.min(page*PER,total)} of ${total}</span>`;
+    h += `<button class="page-btn" onclick="goPage(${page-1})" ${page===1?'disabled':''}>&#8249;</button>`;
+    for (let i=1; i<=pages; i++)
+      h += `<button class="page-btn${i===page?' active':''}" onclick="goPage(${i})">${i}</button>`;
+    h += `<button class="page-btn" onclick="goPage(${page+1})" ${page===pages?'disabled':''}>&#8250;</button>`;
+    pg.innerHTML = h;
+  }
+
+  function goPage(p) { page = p; renderTable(); }
+
+  function updateStats() {
+    document.getElementById('s-total').textContent  = students.length;
+    document.getElementById('s-active').textContent = students.filter(s => s.status==='Active').length;
+    document.getElementById('s-depts').textContent  = new Set(students.map(s => s.dept)).size;
+  }
+
+  function addStudent() {
+    const name  = document.getElementById('f-name').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+    const dept  = document.getElementById('f-dept').value;
+    const year  = document.getElementById('f-year').value;
+    const err   = document.getElementById('form-err');
+
+    if (!name || !email || !dept || !year) { err.textContent = 'Please fill all fields.'; return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Enter a valid email.'; return; }
+
+    err.textContent = '';
+    students.unshift({ id: nextId++, name, email, dept, year, status: 'Active' });
+    clearForm();
+    page = 1;
+    renderTable();
+    showToast('Student added successfully');
+  }
+
+  function clearForm() {
+    ['f-name','f-email'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-dept').value = '';
+    document.getElementById('f-year').value = '';
+    document.getElementById('form-err').textContent = '';
+  }
+
+  function deleteStudent(id) {
+    students = students.filter(s => s.id !== id);
+    renderTable();
+    showToast('Student removed');
+  }
+
+  function cycleStatus(id) {
+    const s = students.find(s => s.id === id);
+    if (!s) return;
+    const cycle = { Active:'Inactive', Inactive:'Pending', Pending:'Active' };
+    s.status = cycle[s.status];
+    renderTable();
+    showToast('Status updated to ' + s.status);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  renderTable();
+</script>
 </body>
 </html>
