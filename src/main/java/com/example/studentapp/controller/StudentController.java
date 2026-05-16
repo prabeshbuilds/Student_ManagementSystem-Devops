@@ -30,6 +30,11 @@ public class StudentController {
         return ResponseEntity.ok(repository.findAll());
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("Application is running");
+    }
+
     // 🔍 Get Student by ID
     @GetMapping("/{id}")
     public ResponseEntity<Student> getStudentById(@PathVariable int id) {
