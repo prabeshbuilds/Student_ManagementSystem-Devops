@@ -67,7 +67,7 @@ pipeline {
                     counter=1
                     while [ \$counter -le 15 ]; do
                         echo "Health check attempt \$counter/15..."
-                        if curl -f ${DEPLOY_SERVER}:${APP_PORT}/actuator/health; then
+                        if curl -f ${DEPLOY_SERVER}:${APP_PORT}/students/health; then
                             echo "✅ App is healthy!"
                             exit 0
                         fi
