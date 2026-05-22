@@ -70,8 +70,8 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 sh """
-            docker push $DOCKER_IMAGE:$DOCKER_TAG
-            docker push $DOCKER_IMAGE:latest
+                docker push $DOCKER_IMAGE:$DOCKER_TAG
+                docker push $DOCKER_IMAGE:latest
                 """
             }
         }
