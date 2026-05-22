@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "prabeshdevops/student-app"
-        DOCKER_TAG = "latest"
+        DOCKER_TAG = "${BUILD_NUMBER}"
         DOCKER_CREDENTIALS_ID = "dockerhub-credentials"
         SONARQUBE_ENV = "sonarqube-server"
         JAR_NAME = "student-app-0.0.1-SNAPSHOT.jar"
@@ -48,7 +48,10 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t $DOCKER_IMAGE:$DOCKER_TAG ."
+                sh """
+                docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
+                docker tag $DOCKER_IMAGE:$DOCKER_TAG $DOCKER_IMAGE:latest
+                """
             }
         }
 
@@ -66,7 +69,10 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                sh "docker push $DOCKER_IMAGE:$DOCKER_TAG "
+                sh """
+            docker push $DOCKER_IMAGE:$DOCKER_TAG
+            docker push $DOCKER_IMAGE:latest
+                """
             }
         }
 
