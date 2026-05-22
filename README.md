@@ -52,12 +52,37 @@ Using the Maven wrapper:
 java -jar target/student-app-0.0.1-SNAPSHOT.jar
 ```
 
+Build without running tests:
+
+```bash
+./mvnw clean package -DskipTests
+```
+
 Or using Maven directly:
 
 ```bash
 mvn clean package
 java -jar target/student-app-0.0.1-SNAPSHOT.jar
 ```
+
+Build without tests using Maven directly:
+
+```bash
+mvn clean package -DskipTests
+```
+
+### Docker Compose
+
+Build and start the application with Docker Compose:
+
+```bash
+docker compose up -d --build
+```
+
+The Compose setup includes:
+
+- `app` service on host port `9090` mapped to container port `8080`
+- `db` service running PostgreSQL 16 with database `student_db`
 
 ### Run with prod profile
 
