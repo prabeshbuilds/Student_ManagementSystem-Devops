@@ -34,6 +34,12 @@ public class StudentController {
     public ResponseEntity<String> healthCheck() {
         return ResponseEntity.ok("Application is running");
     }
+    @GetMapping("/version")
+    public ResponseEntity<String> versionCheck() {
+        return ResponseEntity.ok("Application version: 1.0.0");
+    }
+
+
 
     // 🔍 Get Student by ID
     @GetMapping("/{id}")
