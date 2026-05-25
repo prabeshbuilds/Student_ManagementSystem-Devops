@@ -10,7 +10,7 @@ pipeline {
         DEPLOY_PORT   = "22"
 
         APP_NAME = "student-app"
-        APP_PORT = "8080"
+        APP_PORT = "9099"
 
         ENV_FILE = "/home/ubuntu/.spring.env"
     }
@@ -66,7 +66,7 @@ pipeline {
                             echo "Waiting for application..."
                             sleep 20
 
-                            if curl -f http://localhost:${APP_PORT}/students/health; then
+                            if curl -f http://localhost:${APP_PORT}/students/health then
                                 echo "Application is healthy"
                             else
                                 echo "Application failed"
