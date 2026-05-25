@@ -63,13 +63,18 @@ pipeline {
                 sshagent(['deployment-server-ssh']) {
                     sh """
                     ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
-                        if curl -fsS http://localhost:${APP_PORT}/students/health > /dev/null; then
-                            echo "Application is healthy"
-                        else
-                            echo "Application health check failed"
-                            docker logs ${APP_NAME} --tail 100
-                            exit 1
-                        fi
+                        echo "Waiting for application to start..."
+                        for attempt in 1 2 3 4 5 6; do
+                            if curl -fsS http://localhost:${APP_PORT}/students/health > /dev/null; then
+                                echo "Application is healthy"
+                                exit 0
+                            fi
+                            echo "Attempt ${attempt}/6 failed, waiting 5s..."
+                            sleep 5
+                        done
+                        echo "Application health check failed after 6 attempts"
+                        docker logs ${APP_NAME} --tail 100
+                        exit 1
                     '
                     """
                 }
