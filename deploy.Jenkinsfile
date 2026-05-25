@@ -10,7 +10,7 @@ pipeline {
         DEPLOY_PORT   = "22"
 
         APP_NAME = "student-app"
-        APP_PORT = "9090"
+        APP_PORT = "9099"
 
         ENV_FILE = "/home/ubuntu/.spring.env"
     }
@@ -62,20 +62,15 @@ pipeline {
             steps {
                 sshagent(['deployment-server-ssh']) {
                     sh """
-                    retries=0
-
-                    until curl -fsS http://${DEPLOY_SERVER}:${APP_PORT}/students/health -o /dev/null; do
-                        retries=\$((retries + 1))
-                        echo "Health check attempt \$retries failed. Retrying..."
-                        if [ "\$retries" -ge 12 ]; then
-                            echo "Application health check failed after \$retries attempts"
-                            ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} 'docker logs ${APP_NAME} --tail 100'
+                    ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
+                        if curl -fsS http://localhost:${APP_PORT}/students/health > /dev/null; then
+                            echo "Application is healthy"
+                        else
+                            echo "Application health check failed"
+                            docker logs ${APP_NAME} --tail 100
                             exit 1
                         fi
-                        sleep 5
-                    done
-
-                    echo "Application is healthy"
+                    '
                     """
                 }
             }
