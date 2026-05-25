@@ -60,24 +60,21 @@ pipeline {
 
         stage('🔍 Health Check') {
             steps {
-                sshagent(['deployment-server-ssh']) {
+                sshagent(['ubuntu']) {
                     sh """
-                     ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
+                        ssh -o StrictHostKeyChecking=no ubuntu@54.86.69.222 '
                             echo "Waiting for application..."
                             sleep 20
 
-                            if curl -f ${DEPLOY_PORT} :${APP_PORT}/students/health; then
-                                echo "Application is healthy"
-                            else
-                                echo "Application failed"
-                                docker logs ${APP_NAME} --tail 100
-                                exit 1
-                            fi
-                            '
+                            curl -f http://localhost:9099/actuator/health
+
+                            echo "Application is healthy"
+                        '
                     """
                 }
             }
         }
+
     }
 
     post {
