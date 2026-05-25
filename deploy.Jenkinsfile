@@ -10,7 +10,7 @@ pipeline {
         DEPLOY_PORT   = "22"
 
         APP_NAME = "student-app"
-        APP_PORT = "9099"
+        APP_PORT = "9090"
 
         ENV_FILE = "/home/ubuntu/.spring.env"
     }
