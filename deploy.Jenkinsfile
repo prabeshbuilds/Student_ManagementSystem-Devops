@@ -66,7 +66,7 @@ pipeline {
                             echo "Waiting for application..."
                             sleep 20
 
-                            if curl -f http://localhost:${APP_PORT}/students/health then
+                            if curl -f http://localhost:${APP_PORT}/students/health; then
                                 echo "Application is healthy"
                             else
                                 echo "Application failed"
