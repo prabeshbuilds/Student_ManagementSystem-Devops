@@ -62,23 +62,20 @@ pipeline {
             steps {
                 sshagent(['deployment-server-ssh']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
-                        echo "Waiting for application health endpoint..."
-                        retries=0
+                    retries=0
 
-                        until curl -fsS http://localhost:${APP_PORT}/students/health -o /dev/null; do
-                            retries=\$((retries + 1))
-                            echo "Health check attempt \$retries failed. Retrying..."
-                            if [ "\$retries" -ge 12 ]; then
-                                echo "Application health check failed after \$retries attempts"
-                                docker logs ${APP_NAME} --tail 100
-                                exit 1
-                            fi
-                            sleep 5
-                        done
+                    until curl -fsS http://${DEPLOY_SERVER}:${APP_PORT}/students/health -o /dev/null; do
+                        retries=\$((retries + 1))
+                        echo "Health check attempt \$retries failed. Retrying..."
+                        if [ "\$retries" -ge 12 ]; then
+                            echo "Application health check failed after \$retries attempts"
+                            ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} 'docker logs ${APP_NAME} --tail 100'
+                            exit 1
+                        fi
+                        sleep 5
+                    done
 
-                        echo "Application is healthy"
-                    '
+                    echo "Application is healthy"
                     """
                 }
             }
