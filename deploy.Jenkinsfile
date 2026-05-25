@@ -60,21 +60,29 @@ pipeline {
 
         stage('🔍 Health Check') {
             steps {
-                sshagent(['ubuntu']) {
+                sshagent(['deployment-server-ssh']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@54.86.69.222 '
-                            echo "Waiting for application..."
-                            sleep 20
+                    ssh -o StrictHostKeyChecking=no -p ${DEPLOY_PORT} ${DEPLOY_USER}@${DEPLOY_SERVER} '
+                        echo "Waiting for application health endpoint..."
+                        retries=0
 
-                            curl -f http://localhost:9099/actuator/health
+                        until curl -fsS http://localhost:${APP_PORT}/students/health -o /dev/null; do
+                            retries=$((retries + 1))
+                            echo "Health check attempt ${retries} failed. Retrying..."
+                            if [ "$retries" -ge 12 ]; then
+                                echo "Application health check failed after ${retries} attempts"
+                                docker logs ${APP_NAME} --tail 100
+                                exit 1
+                            fi
+                            sleep 5
+                        done
 
-                            echo "Application is healthy"
-                        '
+                        echo "Application is healthy"
+                    '
                     """
                 }
             }
         }
-
     }
 
     post {
