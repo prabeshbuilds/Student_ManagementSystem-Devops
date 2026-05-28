@@ -66,13 +66,13 @@ pipeline {
                         echo "Health checking on ${DEPLOY_SERVER}:${APP_PORT}..."
                         retries=0
                         
-                        until curl -fsS http://localhost:${APP_PORT}/actuator/health -o /dev/null; do
+                        until curl -fsS http://${DEPLOY_SERVER}:${APP_PORT}/actuator/health -o /dev/null; do
                             retries=\$((retries + 1))
                             echo "Attempt \$retries/12 - waiting for app..."
                             if [ "\$retries" -ge 12 ]; then
                                 echo "Health check failed after 12 attempts"
                                 echo "Actuator health response:"
-                                curl -sS http://localhost:${APP_PORT}/actuator/health || true
+                                curl -sS http://${DEPLOY_SERVER}:${APP_PORT}/actuator/health || true
                                 echo
                                 echo "Disk usage on deployment server:"
                                 df -h
