@@ -71,6 +71,11 @@ pipeline {
                             echo "Attempt \$retries/12 - waiting for app..."
                             if [ "\$retries" -ge 12 ]; then
                                 echo "Health check failed after 12 attempts"
+                                echo "Actuator health response:"
+                                curl -sS http://localhost:${APP_PORT}/actuator/health || true
+                                echo
+                                echo "Disk usage on deployment server:"
+                                df -h
                                 docker logs ${APP_NAME} --tail 50
                                 exit 1
                             fi
