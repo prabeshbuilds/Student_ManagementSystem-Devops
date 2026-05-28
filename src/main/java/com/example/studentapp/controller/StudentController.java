@@ -32,8 +32,55 @@ public class StudentController {
 
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.ok("Application is running");
+
+        String html = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Health Check</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f6f9;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                    }
+
+                    .card {
+                        background: white;
+                        padding: 40px;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                        text-align: center;
+                    }
+
+                    h1 {
+                        color: #28a745;
+                    }
+
+                    p {
+                        color: #555;
+                        font-size: 18px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <h1>Hello Buddy Application is Running</h1>
+                    <p>Your Spring Boot service is healthy.</p>
+                </div>
+            </body>
+            </html>
+            """;
+
+        return ResponseEntity.ok()
+                .header("Content-Type", "text/html")
+                .body(html);
     }
+
     @GetMapping("/version")
     public ResponseEntity<String> versionCheck() {
         return ResponseEntity.ok("Application version: 1.0.0");
