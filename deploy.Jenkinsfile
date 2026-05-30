@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = "prabeshdevops/student-app"
         IMAGE_TAG  = "latest"
 
-        DEPLOY_SERVER = "54.157.204.40"
+        DEPLOY_SERVER = "98.80.228.60"
         DEPLOY_USER   = "ubuntu"
         DEPLOY_PORT   = "22"
 
