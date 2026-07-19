@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: ["Java CI with Maven and Docker"]
     types: [completed]
-    branches: [main, master]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
